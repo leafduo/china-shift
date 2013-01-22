@@ -8,11 +8,13 @@ program
     .version('0.0.1')
     .option('--lat [range]', 'latitude range')
     .option('--lon [range]', 'longitude range')
+    .option('--output <file>', 'output filename')
     .parse(process.argv);
 
 var result = {};
 var accuracy = 0.01;
 var roundLevel = 100;
+var filename = program.output;
 
 var convert = function(coods, callback) {
     var x = []
@@ -28,12 +30,12 @@ var convert = function(coods, callback) {
                 var shiftX = parseFloat(new Buffer(json[index].x, 'base64').toString()) - x[index];
                 var shiftY = parseFloat(new Buffer(json[index].y, 'base64').toString()) - y[index];
                 data = util.format("%d %d %s %s\n", x[index], y[index], shiftX, shiftY);
-                fs.appendFile('0.01.txt', data);
+                fs.appendFile(filename, data);
             });
-            callback();
         } else {
             console.log(error, json);
         }
+        callback();
     });
 }
 

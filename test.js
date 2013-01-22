@@ -8,6 +8,14 @@ var map = JSON.parse(fs.readFileSync('beijing_shift.json'))
 var accuracy = 0.01;
 var roundLevel = 100;
 
+function estimate(x, y, x1, y1, x2, y2) {
+
+    function helper(index) {
+        return roundLevel * roundLevel *((x-x1)*(y-y1)*map[x2][y2][index] + (x-x1)*(y2-y)*map[x2][y1][index] + (x2-x)*(y-y1)*map[x1][y2][index] + (x2-x)*(y2-y)*map[x1][y1][index]);
+    }
+    return [helper(0), helper(1)];
+}
+
 var test = function(cood, callback) {
     var x = cood[0]
     ,y = cood[1];
@@ -24,11 +32,15 @@ var test = function(cood, callback) {
             roundedY1 = Math.round((roundedY+accuracy)*roundLevel)/roundLevel;
             var baiduX = parseFloat(new Buffer(json.x, 'base64').toString()) - x;
             var baiduY = parseFloat(new Buffer(json.y, 'base64').toString()) - y;
-            var ourX = (map[roundedX][roundedY][0] + map[roundedX1][roundedY][0] + map[roundedX][roundedY1][0] + map[roundedX1][roundedY1][0])/4
-            var ourY = (map[roundedX][roundedY][1] + map[roundedX1][roundedY][1] + map[roundedX][roundedY1][1] + map[roundedX1][roundedY1][1])/4
-            var diffX = (baiduX - ourX) * 111000;
-            var diffY = (baiduY - ourY) * 111000;
-            console.log("%d %d %d %d %d %d %d %d %d", Math.sqrt(diffX*diffX + diffY*diffY), x, y, baiduX, ourX, diffX, baiduY, ourY, diffY);
+            var oldX = (map[roundedX][roundedY][0] + map[roundedX1][roundedY][0] + map[roundedX][roundedY1][0] + map[roundedX1][roundedY1][0])/4
+            var oldY = (map[roundedX][roundedY][1] + map[roundedX1][roundedY][1] + map[roundedX][roundedY1][1] + map[roundedX1][roundedY1][1])/4
+            var newX = estimate(x, y, roundedX, roundedY, roundedX1, roundedY1)[0];
+            var newY = estimate(x, y, roundedX, roundedY, roundedX1, roundedY1)[1];
+            var diffX = (baiduX - oldX) * 111000;
+            var diffY = (baiduY - oldY) * 111000;
+            var newDiffX = (baiduX - newX) * 111000;
+            var newDiffY = (baiduY - newY) * 111000;
+            console.log("%d %d %d %d", Math.sqrt(newDiffX*newDiffX + newDiffY*newDiffY), Math.sqrt(diffX*diffX + diffY*diffY), x, y);
         } else {
             console.log(error);
         }
