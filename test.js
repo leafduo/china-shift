@@ -3,7 +3,10 @@ var fs = require('fs');
 var async = require('async');
 var util = require('util');
 
-var map = JSON.parse(fs.readFileSync('shift_gcj02_bd09.json'))
+var map = JSON.parse(fs.readFileSync('beijing_shift.json'))
+
+var accuracy = 0.01;
+var roundLevel = 100;
 
 var test = function(cood, callback) {
     var x = cood[0]
@@ -15,10 +18,10 @@ var test = function(cood, callback) {
                 console.log(json);
                 return;
             }
-            roundedX = Math.floor(x*10)/10;
-            roundedY = Math.floor(y*10)/10;
-            roundedX1 = Math.round((roundedX+0.1)*10)/10;
-            roundedY1 = Math.round((roundedY+0.1)*10)/10;
+            roundedX = Math.floor(x*roundLevel)/roundLevel;
+            roundedY = Math.floor(y*roundLevel)/roundLevel;
+            roundedX1 = Math.round((roundedX+accuracy)*roundLevel)/roundLevel;
+            roundedY1 = Math.round((roundedY+accuracy)*roundLevel)/roundLevel;
             var baiduX = parseFloat(new Buffer(json.x, 'base64').toString()) - x;
             var baiduY = parseFloat(new Buffer(json.y, 'base64').toString()) - y;
             var ourX = (map[roundedX][roundedY][0] + map[roundedX1][roundedY][0] + map[roundedX][roundedY1][0] + map[roundedX1][roundedY1][0])/4
@@ -33,8 +36,8 @@ var test = function(cood, callback) {
     });
 }
 
-var minX = 74, maxX = 135;
-var minY = 19, maxY = 53;
+var minX = 39, maxX = 41.1;
+var minY = 115.2, maxY = 117.5;
 
 var list = [];
 for (var i=0;i<1000;++i) {
