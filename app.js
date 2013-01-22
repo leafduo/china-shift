@@ -27,20 +27,21 @@ var convert = function(coods, callback) {
             json.forEach(function(element, index, array) {
                 var shiftX = parseFloat(new Buffer(json[index].x, 'base64').toString()) - x[index];
                 var shiftY = parseFloat(new Buffer(json[index].y, 'base64').toString()) - y[index];
-                console.log("%d %d %s %s", x[index], y[index], shiftX, shiftY);
+                data = util.format("%d %d %s %s\n", x[index], y[index], shiftX, shiftY);
+                fs.appendFile('0.01.txt', data);
             });
             callback();
         } else {
-            console.log("%j", json);
+            console.log(error, json);
         }
     });
 }
 
 if (!program.lat) {
-    program.lat = '19,53';
+    program.lat = '74,135';
 }
 if (!program.lon) {
-    program.lon = '74,135';
+    program.lon = '19,53';
 }
 var lat = program.lat.split(','),
     lon = program.lon.split(',');
